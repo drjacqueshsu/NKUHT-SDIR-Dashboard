@@ -94,6 +94,18 @@ var TWEAK_DEFAULTS = {
   "accent": "green-gold",
   "density": "comfortable"
 };
+// 從 localStorage 還原偏好；無紀錄時主題跟隨系統 prefers-color-scheme
+function loadTweaks() {
+  var base = Object.assign({}, TWEAK_DEFAULTS);
+  if (typeof window !== "undefined" && window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
+    base.theme = "dark";
+  }
+  try {
+    var saved = JSON.parse(localStorage.getItem("nkuht-tweaks") || "null");
+    if (saved) return Object.assign(base, saved);
+  } catch (e) {}
+  return base;
+}
 function App() {
   var _useState = useState("overview"),
     _useState2 = _slicedToArray(_useState, 2),
@@ -111,7 +123,7 @@ function App() {
     _useState8 = _slicedToArray(_useState7, 2),
     lang = _useState8[0],
     setLang = _useState8[1];
-  var _useState9 = useState(TWEAK_DEFAULTS),
+  var _useState9 = useState(loadTweaks),
     _useState0 = _slicedToArray(_useState9, 2),
     tweaks = _useState0[0],
     setTweaks = _useState0[1];
@@ -122,6 +134,9 @@ function App() {
   useEffect(function () {
     document.documentElement.dataset.theme = tweaks.theme;
     document.documentElement.style.setProperty("--fs", tweaks.density === "compact" ? "13px" : "14px");
+    try {
+      localStorage.setItem("nkuht-tweaks", JSON.stringify(tweaks));
+    } catch (e) {}
   }, [tweaks]);
   useEffect(function () {
     var handler = function handler(e) {

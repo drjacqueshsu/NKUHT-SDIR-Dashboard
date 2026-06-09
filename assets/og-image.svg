@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#08471f"/>
+      <stop offset="1" stop-color="#0a5a2e"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect x="0" y="0" width="1200" height="10" fill="#c8a64b"/>
+  <g transform="translate(120,205)">
+    <rect width="220" height="220" rx="28" fill="#ffffff"/>
+    <rect x="34" y="150" width="152" height="14" rx="7" fill="#c8a64b"/>
+    <text x="110" y="135" font-family="'Noto Serif TC',serif" font-size="150" font-weight="900" fill="#0a5a2e" text-anchor="middle">校</text>
+  </g>
+  <g transform="translate(400,255)">
+    <text x="0" y="0" font-family="'Noto Sans TC',sans-serif" font-size="64" font-weight="900" fill="#ffffff">校務公開資料儀表板</text>
+    <text x="4" y="64" font-family="'Noto Sans TC',sans-serif" font-size="34" font-weight="700" fill="#e8d27a">國立高雄餐旅大學 NKUHT</text>
+    <text x="4" y="128" font-family="'Noto Sans TC',sans-serif" font-size="26" fill="#aceac9">六年趨勢 × 八大指標 · 學生 / 師資 / 研究 / 財務 / 治理 / SDGs</text>
+  </g>
+</svg>
