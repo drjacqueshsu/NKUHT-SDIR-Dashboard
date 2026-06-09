@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NKUHT 校務公開資料儀表板</title>
+  <meta name="description" content="國立高雄餐旅大學 校務公開資料儀表板 — 學生組成、就業力、師資、研究產學、財務、治理與永續(SDGs)的互動式戰情面板。">
+
+  <!-- 字型改用 Google Fonts CDN（原版內嵌 220 個 woff2 子集，已移除） -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Serif+TC:wght@700;900&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <noscript>
+    <div style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#0a5a2e;color:#e8d27a;font:16px/1.5 system-ui,sans-serif;text-align:center;padding:24px;">
+      本儀表板需要啟用 JavaScript 才能顯示。<br>This dashboard requires JavaScript to display.
+    </div>
+  </noscript>
+
+  <div id="root"></div>
+
+  <!-- React 18.3.1（production UMD，本機 vendored） -->
+  <script src="assets/vendor/react.production.min.js"></script>
+  <script src="assets/vendor/react-dom.production.min.js"></script>
+
+  <!-- 資料層（全域：window.NKUHT_DATA / NKUHT_DATA_X / NKUHT_UTIL / NKUHT_UNIT） -->
+  <script src="assets/data/dataset.js"></script>
+  <script src="assets/data/aggregated.js"></script>
+  <script src="assets/js/utils.js"></script>
+  <script src="assets/js/unit-filter.js"></script>
+
+  <!-- 應用程式元件（JSX 已於建置期以 Babel react+env 預先編譯為一般 JS） -->
+  <script src="assets/js/components.js"></script>
+  <script src="assets/js/charts-ext.js"></script>
+  <script src="assets/js/visual-ext.js"></script>
+  <script src="assets/js/modules.js"></script>
+  <script src="assets/js/modules-ext.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>

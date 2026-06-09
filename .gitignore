@@ -1,0 +1,11 @@
+# Dev-only preview config (points at a local absolute path)
+.claude/
+
+# Dependencies / build caches (none needed for this static site)
+node_modules/
+.wrangler/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.log
