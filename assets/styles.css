@@ -2141,3 +2141,58 @@ table.data.data-tight th.num { text-align: right; font-feature-settings: "tnum";
   align-self: flex-start;
 }
 .embed-open:hover { background: var(--green); color: #fff; border-color: var(--green); }
+
+/* ============================================================
+   內嵌區塊的「說明提示框」與標題標籤（讓使用者看得懂）
+   ============================================================ */
+.embed-badge {
+  display: inline-block;
+  margin-left: 10px;
+  vertical-align: middle;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .3px;
+  color: var(--green-2);
+  background: var(--gold-3);
+  border: 1px solid var(--gold);
+  padding: 2px 9px;
+  border-radius: 100px;
+  white-space: nowrap;
+}
+[data-theme="dark"] .embed-badge { color: #11271a; }
+
+.embed-note {
+  display: flex;
+  gap: 12px;
+  background: var(--green-light);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--green);
+  border-radius: var(--radius-sm);
+  padding: 13px 16px;
+  margin-bottom: 14px;
+}
+.embed-note-ic {
+  flex-shrink: 0;
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: var(--green);
+  color: #fff;
+  font-size: 14px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  margin-top: 1px;
+}
+.embed-note-body { font-size: 12.5px; line-height: 1.7; color: var(--text); }
+.embed-note-title { font-weight: 700; color: var(--green); margin-bottom: 4px; font-size: 13px; }
+.embed-note-p { margin: 0 0 4px; color: var(--text-muted); }
+.embed-note-howto {
+  margin-top: 7px;
+  padding-top: 7px;
+  border-top: 1px dashed var(--border);
+  color: var(--text-muted);
+  font-size: 12px;
+}
+.embed-note-howto b { color: var(--gold-2); }
+@media (max-width: 720px) {
+  .embed-note { padding: 11px 13px; }
+  .embed-badge { display: inline-block; margin: 6px 0 0; }
+}
