@@ -2037,3 +2037,78 @@ table.data.data-tight th.num { text-align: right; font-feature-settings: "tnum";
   .stack-row { grid-template-columns: 100px 1fr 50px; }
 }
 
+
+/* ============================================================
+   行動裝置 RWD 專用 UI（<=720px 手機/小平板，<=430px 窄機）
+   ============================================================ */
+@media (max-width: 720px) {
+  /* 收窄各列水平內距，換回畫面空間 */
+  .brand-strip { padding: 10px 14px; flex-wrap: wrap; gap: 10px; }
+  .sub-header  { padding: 8px 14px; flex-wrap: wrap; gap: 6px; }
+  .filter-bar  { padding: 10px 14px; gap: 10px; }
+  .tabs        { padding: 0 14px; }
+  .main        { padding: 16px 14px 56px; max-width: 100%; }
+
+  /* 品牌列縮小 */
+  .brand-logo-wrap { width: 44px; height: 44px; }
+  .brand-text h1 { font-size: 15px; letter-spacing: .5px; }
+  .brand-text p  { font-size: 10.5px; }
+  .brand-meta { gap: 10px; font-size: 11px; flex-wrap: wrap; }
+
+  /* 篩選器：改為區塊堆疊（手機把各群組垂直排列，並把子層約束在版面寬內） */
+  /* 注意：年份群組由元件設了行內 min-width:480px，需 !important 覆蓋 */
+  .filter-bar { display: block; min-width: 0; }
+  .filter-group { display: flex; flex-wrap: wrap; min-width: 0 !important; max-width: 100% !important; flex-basis: auto !important; margin-bottom: 8px; }
+  .filter-group:last-child { margin-bottom: 0; }
+  select.unit-select { min-width: 0; width: 100%; }
+
+  /* 年份捲軸水平捲動；以 100vw 硬上限避開 flex min-content 撐破問題 */
+  .year-scrub {
+    min-width: 0; width: 100%; max-width: calc(100vw - 28px);
+    overflow-x: auto; -webkit-overflow-scrolling: touch;
+  }
+
+  /* 分頁列改成可水平捲動的標籤條（取代換行） */
+  .tabs { flex-wrap: nowrap !important; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+  .tabs::-webkit-scrollbar { height: 0; }
+  .tab { padding: 10px 12px; font-size: 13px; }
+
+  /* 12 欄網格全部單欄堆疊 */
+  .span-3, .span-4, .span-5, .span-6, .span-7, .span-8, .span-9 { grid-column: span 12 !important; }
+
+  /* KPI 牆改 2 欄 */
+  .kpi-wall { grid-template-columns: repeat(2, 1fr) !important; gap: 10px; }
+
+  /* Hero 區縮小 */
+  .module-hero { padding: 22px 18px; }
+  .module-hero-headline { font-size: 22px; }
+  .module-hero-stats { gap: 16px; }
+  .sdg-grid { grid-template-columns: repeat(3, 1fr) !important; }
+
+  /* 標題與字級 */
+  .section-head h2 { font-size: 17px; }
+  .section-head { flex-wrap: wrap; gap: 8px; }
+}
+
+@media (max-width: 430px) {
+  .module-hero-headline { font-size: 20px; }
+  .sdg-grid { grid-template-columns: repeat(2, 1fr) !important; }
+  .brand-meta { width: 100%; }
+}
+
+/* ============================================================
+   進場 / 分頁切換轉場：純 CSS 掛載動畫（淡入上滑）
+   區塊建立時播放一次（首次載入與每次切分頁都重新掛載）。
+   刻意「不」用 fill-mode（預設 none）：未套用動畫時元素維持正常
+   狀態（opacity:1 可見），動畫有播放才淡入 —— 內容永遠不會卡在
+   隱藏，且不依賴 JS。reduce-motion 時整段不套用。
+   ============================================================ */
+@media (prefers-reduced-motion: no-preference) {
+  .section, .module-hero, .sdg-hero, .kpi-wall {
+    animation: secEnter .5s cubic-bezier(.22, .61, .36, 1);
+  }
+  @keyframes secEnter {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: none; }
+  }
+}

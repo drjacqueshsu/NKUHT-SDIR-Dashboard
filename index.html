@@ -97,6 +97,32 @@
   <script src="assets/js/app.js"></script>
 
   <script>
+    // 進場動畫保底：正常瀏覽器 0.5s 內就播完並停在完全顯示，此保底為 no-op；
+    // 萬一動畫未推進（極少數環境），掛載 1.8 秒後強制關閉動畫使內容必定可見。
+    // 透過 MutationObserver 涵蓋初次載入與每次切分頁/重繪新掛載的區塊。
+    (function () {
+      var SEL = ".section, .module-hero, .sdg-hero, .kpi-wall";
+      function settle() {
+        var els = document.querySelectorAll(SEL);
+        for (var i = 0; i < els.length; i++) {
+          if (parseFloat(getComputedStyle(els[i]).opacity) < 0.99) els[i].style.animation = "none";
+        }
+      }
+      var t;
+      function schedule() { clearTimeout(t); t = setTimeout(settle, 1800); }
+      schedule();
+      var root = document.getElementById("root");
+      if (root) {
+        new MutationObserver(function (muts) {
+          for (var i = 0; i < muts.length; i++) {
+            if (muts[i].addedNodes.length) { schedule(); break; }
+          }
+        }).observe(root, { childList: true, subtree: true });
+      }
+    })();
+  </script>
+
+  <script>
     // 輪詢 #root，待 React 掛載出內容後淡出開場畫面（最多等 4 秒保底）
     (function () {
       var splash = document.getElementById("__splash");
