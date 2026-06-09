@@ -203,7 +203,7 @@ function App() {
             year: year,
             unit: unit
           }),
-          React.createElement(UCANSection, null));
+          React.createElement(UCANSection, { lang: lang }));
       case "welfare":
         return React.createElement(WelfareModule, {
           lang: lang,
@@ -229,7 +229,7 @@ function App() {
             year: year,
             unit: unit
           }),
-          React.createElement(DeepCultivationSection, null));
+          React.createElement(DeepCultivationSection, { lang: lang }));
       case "governance":
         return React.createElement(GovernanceModule, {
           lang: lang,
