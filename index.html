@@ -30,34 +30,48 @@
   <link rel="stylesheet" href="assets/styles.css">
 
   <style>
-    /* 載入開場：校徽柔和浮現，React 掛載後緩慢淡出（避免白畫面閃爍） */
+    /* 載入開場（商用標準）：校徽單次沉穩浮現 + 金色進度條平順填滿，再緩慢淡出 */
     #__splash {
       position: fixed; inset: 0; z-index: 9999;
-      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 26px;
-      background: linear-gradient(180deg, #08471f, #0a5a2e);
-      transition: opacity .9s ease; opacity: 1;
+      display: flex; align-items: center; justify-content: center;
+      background: radial-gradient(125% 125% at 50% 36%, #0c6536 0%, #0a5a2e 46%, #06371a 100%);
+      transition: opacity .8s ease; opacity: 1;
     }
     #__splash.hide { opacity: 0; pointer-events: none; }
-    #__splash .logo-card {
-      width: 132px; height: 132px; border-radius: 26px; background: #fff;
+    #__splash .sp { display: flex; flex-direction: column; align-items: center; padding: 0 24px; }
+    #__splash .sp-logo {
+      width: 112px; height: 112px; border-radius: 24px; background: #fff;
       display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 16px 44px rgba(0,0,0,.28);
-      animation: __logoIn 1s cubic-bezier(.22,.61,.36,1) both, __logoFloat 3.4s ease-in-out 1s infinite;
+      box-shadow: 0 20px 52px rgba(0,0,0,.34), inset 0 0 0 1px rgba(0,0,0,.04);
+      animation: __spIn .8s cubic-bezier(.16,.84,.44,1) both;
     }
-    #__splash .logo-card img { width: 88px; height: auto; display: block; }
-    #__splash .title { color: #e8d27a; font-family: "Noto Sans TC",sans-serif; font-weight: 700; font-size: 17px; letter-spacing: 3px;
-      animation: __fadeUp 1s ease .25s both; }
-    #__splash .bar { width: 170px; height: 3px; border-radius: 3px; background: rgba(255,255,255,.16); overflow: hidden;
-      animation: __fadeUp 1s ease .45s both; }
-    #__splash .bar::before { content: ""; display: block; height: 100%; width: 35%; border-radius: 3px;
-      background: linear-gradient(90deg, transparent, #e8d27a, transparent); animation: __loadbar 2s ease-in-out infinite; }
-    @keyframes __logoIn { from { opacity: 0; transform: scale(.78); } to { opacity: 1; transform: scale(1); } }
-    @keyframes __logoFloat { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
-    @keyframes __fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
-    @keyframes __loadbar { 0% { transform: translateX(-120%); } 100% { transform: translateX(420%); } }
+    #__splash .sp-logo img { width: 76px; height: auto; display: block; }
+    #__splash .sp-title {
+      margin-top: 26px; color: #fff; font-family: "Noto Sans TC", sans-serif;
+      font-weight: 700; font-size: 19px; letter-spacing: 5px; padding-left: 5px;
+      animation: __spRise .8s ease .12s both;
+    }
+    #__splash .sp-sub {
+      margin-top: 9px; color: #bfe0cd; font-family: "Noto Sans TC", sans-serif;
+      font-size: 12px; letter-spacing: 3px; padding-left: 3px;
+      animation: __spRise .8s ease .22s both;
+    }
+    #__splash .sp-track {
+      margin-top: 30px; width: 196px; height: 2px; border-radius: 2px;
+      background: rgba(255,255,255,.15); overflow: hidden;
+      animation: __spRise .8s ease .32s both;
+    }
+    #__splash .sp-track > i {
+      display: block; height: 100%; width: 0; border-radius: 2px;
+      background: linear-gradient(90deg, #c8a64b, #e8d27a);
+      animation: __spFill 1.25s cubic-bezier(.45,.05,.2,1) .3s forwards;
+    }
+    @keyframes __spIn { from { opacity: 0; transform: translateY(10px) scale(.94); } to { opacity: 1; transform: none; } }
+    @keyframes __spRise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+    @keyframes __spFill { 0% { width: 0; } 72% { width: 84%; } 100% { width: 100%; } }
     @media (prefers-reduced-motion: reduce) {
-      #__splash .logo-card, #__splash .title, #__splash .bar { animation: none; opacity: 1; }
-      #__splash .bar::before { animation: none; width: 100%; }
+      #__splash .sp-logo, #__splash .sp-title, #__splash .sp-sub, #__splash .sp-track { animation: none; opacity: 1; }
+      #__splash .sp-track > i { animation: none; width: 100%; }
     }
   </style>
 
@@ -75,9 +89,12 @@
 </head>
 <body>
   <div id="__splash">
-    <div class="logo-card"><img src="assets/logo.gif" alt="國立高雄餐旅大學 校徽" width="88"></div>
-    <div class="title">校務公開資料儀表板</div>
-    <div class="bar"></div>
+    <div class="sp">
+      <div class="sp-logo"><img src="assets/logo.gif" alt="國立高雄餐旅大學 校徽" width="76"></div>
+      <div class="sp-title">校務公開資料儀表板</div>
+      <div class="sp-sub">國立高雄餐旅大學 · NKUHT</div>
+      <div class="sp-track"><i></i></div>
+    </div>
   </div>
   <noscript>
     <div style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#0a5a2e;color:#e8d27a;font:16px/1.5 system-ui,sans-serif;text-align:center;padding:24px;">
@@ -138,14 +155,14 @@
     (function () {
       var splash = document.getElementById("__splash");
       if (!splash) return;
-      var MIN_MS = 1400;            // 最短展示時間
+      var MIN_MS = 1650;            // 最短展示時間（讓金色進度條先平順填滿）
       var start = performance.now ? performance.now() : Date.now();
       var done = false;
       function fadeOut() {
         if (done) return;
         done = true;
         splash.classList.add("hide");
-        setTimeout(function () { if (splash.parentNode) splash.remove(); }, 950);
+        setTimeout(function () { if (splash.parentNode) splash.remove(); }, 850);
       }
       function maybeHide() {
         var elapsed = (performance.now ? performance.now() : Date.now()) - start;
