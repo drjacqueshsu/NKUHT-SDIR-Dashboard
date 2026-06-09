@@ -197,11 +197,13 @@ function App() {
           unit: unit
         });
       case "employability":
-        return React.createElement(EmployabilityModule, {
-          lang: lang,
-          year: year,
-          unit: unit
-        });
+        return React.createElement(React.Fragment, null,
+          React.createElement(EmployabilityModule, {
+            lang: lang,
+            year: year,
+            unit: unit
+          }),
+          React.createElement(UCANSection, null));
       case "welfare":
         return React.createElement(WelfareModule, {
           lang: lang,
@@ -221,11 +223,13 @@ function App() {
           unit: unit
         });
       case "finance":
-        return React.createElement(FinanceModule, {
-          lang: lang,
-          year: year,
-          unit: unit
-        });
+        return React.createElement(React.Fragment, null,
+          React.createElement(FinanceModule, {
+            lang: lang,
+            year: year,
+            unit: unit
+          }),
+          React.createElement(DeepCultivationSection, null));
       case "governance":
         return React.createElement(GovernanceModule, {
           lang: lang,

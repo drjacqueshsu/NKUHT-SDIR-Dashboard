@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght;500;700;900&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>高餐大 UCAN 職涯興趣儀表板</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:"Noto Sans TC",sans-serif;background:#F7F4EA;color:#1F2A24;font-size:14px;}
+:root{--g:#0a5a2e;--dg:#08471f;--gd:#c8a64b;--lg:#e8f1eb;--br:#e3decf;}
+.hdr{background:var(--dg);color:#fff;padding:12px 24px;display:flex;align-items:center;gap:14px;border-bottom:3px solid var(--gd);}
+
+.fbar{background:#fff;border-bottom:1px solid var(--br);padding:8px 24px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+.fbar label{font-size:12px;color:#888;}
+.fbar select{font-size:12px;padding:5px 8px;border:1px solid var(--br);border-radius:5px;background:#fff;color:#1F2A24;cursor:pointer;}
+.tabs{display:flex;background:var(--lg);border-bottom:2px solid var(--br);padding:0 24px;}
+.tab{padding:10px 18px;font-size:13px;color:#666;cursor:pointer;background:none;border:none;border-bottom:3px solid transparent;}
+.tab.on{font-weight:700;color:var(--g);border-bottom:3px solid var(--gd);}
+.pg{display:none;padding:18px 24px;}
+.pg.on{display:block;}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+.kpi{background:#fff;border:1px solid var(--br);border-radius:10px;padding:13px 16px;border-top:3px solid var(--gd);}
+.kpi .lb{font-size:10px;color:#999;margin-bottom:5px;}
+.kpi .nm{font-size:13px;font-weight:700;color:var(--g);line-height:1.3;}
+.kpi .vl{font-size:28px;font-weight:700;color:var(--gd);margin-top:4px;}
+.card{background:#fff;border:1px solid var(--br);border-radius:10px;padding:16px;margin-bottom:14px;overflow:hidden;}
+.ct{font-size:12px;font-weight:700;color:var(--dg);margin-bottom:12px;border-left:3px solid var(--gd);padding-left:8px;}
+.leg{display:flex;gap:14px;flex-wrap:wrap;margin-top:10px;}
+.leg span{display:flex;align-items:center;gap:5px;font-size:11px;}
+.leg i{width:11px;height:11px;border-radius:2px;display:inline-block;flex-shrink:0;}
+canvas{display:block;width:100%!important;}
+table{width:100%;border-collapse:collapse;font-size:12px;}
+thead th{background:var(--dg);color:#fff;padding:7px 10px;text-align:left;cursor:pointer;position:sticky;top:0;font-size:11px;white-space:nowrap;}
+tbody tr:nth-child(even){background:var(--lg);}
+tbody td{padding:6px 10px;border-bottom:1px solid var(--br);}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <img src="data:image/png;base64,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" alt="NKUHT" style="width:44px;height:44px;object-fit:contain;flex-shrink:0;">
+  <div style="flex:1">
+    <div style="font-size:17px;font-weight:700;letter-spacing:.5px;">高餐大 UCAN 職涯興趣儀表板</div>
+    <div style="font-size:11px;opacity:.7;margin-top:2px;">國立高雄餐旅大學｜114 年度｜1–2 年級｜四技・二技｜有效施測 1,497 筆</div>
+  </div>
+  <div style="font-size:10px;opacity:.6;text-align:right;line-height:1.8;">資料來源：UCAN職涯興趣_114</div>
+</div>
+
+<div class="fbar">
+  <label style="color:var(--g);font-weight:700;font-size:12px;">篩選</label>
+  <label>學院：</label>
+  <select id="selCol" onchange="onCol()">
+    <option>全部</option><option>餐旅學院</option><option>觀光學院</option><option>廚藝學院</option><option>國際學院</option>
+  </select>
+  <label>系所：</label>
+  <select id="selDep" onchange="onDep()"><option>全部</option></select>
+  <label>年級：</label>
+  <select id="selGrd" onchange="onGrd()">
+    <option>全部</option><option>1年級</option><option>2年級</option>
+  </select>
+  <span style="font-size:11px;color:#bbb;margin-left:auto;" id="hint">全校</span>
+</div>
+
+<div class="tabs">
+  <button class="tab on" onclick="gTab(0)">職涯興趣總覽</button>
+  <button class="tab" onclick="gTab(1)">學院・系所比較</button>
+  <button class="tab" onclick="gTab(2)">資料表</button>
+</div>
+
+<div id="p0" class="pg on"></div>
+<div id="p1" class="pg"></div>
+<div id="p2" class="pg"></div>
+
+<script>
+// ══ 職涯類型名稱 ══
+const CN=["建築營造","天然資源、食品與農業","藝文與影音傳播","企業經營管理","教育與訓練","金融財務","政府公共事務","醫療保健","個人及社會服務","休閒與觀光旅遊","資訊科技","司法、法律與公共安全","行銷與銷售","製造","科學、技術、工程、數學","物流運輸"];
+
+// ══ 全校整體平均（1+2年級）══
+const OVERALL=[39.7,40.5,43.6,39.0,37.5,38.1,41.4,38.5,39.3,43.4,36.6,39.2,44.0,38.6,35.9,40.6];
+
+// ══ 各學院平均（1+2年級合計）══
+const COL={
+  "餐旅學院":[39.9,39.7,43.1,38.8,37.4,39.1,40.1,38.9,37.1,42.2,36.2,38.5,44.3,37.8,35.0,38.7],
+  "觀光學院":[39.4,39.4,45.6,39.5,39.9,36.5,43.7,39.0,43.2,47.7,36.4,41.2,44.8,38.7,35.7,42.7],
+  "廚藝學院":[41.9,43.5,37.2,38.4,33.7,38.8,38.8,37.7,35.3,37.8,36.1,36.0,40.0,39.4,35.9,38.4],
+  "國際學院":[37.1,41.6,48.8,39.6,37.5,37.8,43.9,37.1,42.6,44.8,38.8,40.8,46.4,39.7,38.7,44.0]
+};
+
+// ══ 各學院 × 年級 ══
+const COL_GRD={
+  "餐旅學院":{"1年級":[38.4,37.9,42.3,37.7,37.1,38.5,39.4,38.2,37.0,41.9,36.1,38.5,43.6,37.0,34.1,38.0],"2年級":[42.2,42.6,44.3,40.5,37.9,40.0,41.1,40.1,37.1,42.7,36.3,38.6,45.3,39.0,36.5,39.9]},
+  "觀光學院":{"1年級":[38.2,36.7,45.4,38.8,39.5,35.1,43.3,37.0,42.6,47.1,36.7,41.0,44.3,37.4,35.1,41.8],"2年級":[40.7,42.5,45.7,40.3,40.2,38.0,44.1,41.3,43.8,48.5,36.0,41.4,45.5,40.1,36.3,43.7]},
+  "廚藝學院":{"1年級":[44.2,45.3,37.7,40.0,36.6,41.4,41.0,39.5,38.2,40.8,39.0,38.9,42.6,42.8,39.1,40.4],"2年級":[38.6,40.9,36.6,36.1,29.4,35.0,35.7,35.1,31.0,33.6,32.0,31.8,36.2,34.5,31.2,35.4]},
+  "國際學院":{"1年級":[37.3,44.4,49.6,39.0,37.5,37.4,43.5,37.1,42.5,43.6,39.2,41.6,47.7,39.8,40.4,44.3],"2年級":[36.5,35.1,46.9,41.0,37.7,38.8,44.7,36.9,43.0,47.4,37.9,38.9,43.4,39.3,34.7,43.2]}
+};
+
+// ══ 各年級整體平均 ══
+const GRD={
+  "1年級":[39.1,39.9,43.6,38.6,37.7,37.9,41.4,37.9,39.6,43.3,37.2,39.7,44.3,38.5,36.2,40.4],
+  "2年級":[40.5,41.5,43.8,39.7,37.2,38.4,41.6,39.3,39.0,43.6,35.7,38.4,43.6,38.7,35.4,40.8]
+};
+
+// ══ 各系所（1+2年級合計）══
+const DEP={
+  "中餐廚藝系":     {col:"廚藝學院",pr:[38.7,42.8,34.3,35.3,30.1,35.7,36.2,36.6,35.0,37.1,34.4,33.4,39.6,38.4,33.5,34.9]},
+  "西餐廚藝系":     {col:"廚藝學院",pr:[46.1,50.6,39.6,42.1,41.1,43.6,45.9,43.4,40.8,40.8,41.6,42.1,45.9,44.1,41.8,43.1]},
+  "烘焙管理系":     {col:"廚藝學院",pr:[41.8,38.7,38.2,38.5,31.5,38.1,35.9,34.5,31.4,36.3,33.6,33.9,35.9,36.8,33.8,38.1]},
+  "旅館管理系":     {col:"餐旅學院",pr:[39.0,39.7,42.7,39.0,39.3,39.5,40.5,38.6,40.2,44.1,34.4,39.3,44.7,36.2,33.6,37.9]},
+  "餐飲管理系":     {col:"餐旅學院",pr:[39.1,40.3,41.3,36.9,35.0,38.0,38.2,38.3,34.2,40.2,35.7,37.3,40.9,38.0,34.7,38.1]},
+  "餐旅暨會展行銷管理系":{col:"餐旅學院",pr:[44.8,37.4,51.4,46.3,43.4,42.5,46.7,42.0,42.4,46.4,41.6,42.0,57.2,40.2,39.3,43.1]},
+  "旅運管理系":     {col:"觀光學院",pr:[31.9,39.5,44.7,38.0,40.3,32.5,43.5,35.4,41.3,45.1,33.1,40.2,45.7,32.5,30.7,38.8]},
+  "休閒暨遊憩管理系":  {col:"觀光學院",pr:[40.7,38.4,45.2,38.7,37.3,35.4,38.5,38.8,39.5,45.1,35.2,38.2,44.3,38.3,35.2,40.2]},
+  "航空暨運輸服務管理系":{col:"觀光學院",pr:[42.4,40.1,46.2,40.8,41.4,39.2,47.2,41.0,46.6,50.8,38.9,43.7,44.7,42.1,38.5,46.3]},
+  "應用英語系":     {col:"國際學院",pr:[32.8,36.4,45.1,38.1,35.3,35.0,42.8,35.5,43.0,43.3,35.8,39.3,45.7,36.3,37.0,43.0]},
+  "應用日語系":     {col:"國際學院",pr:[32.1,34.6,48.9,34.5,28.4,35.2,38.8,30.4,35.5,40.5,35.8,33.5,39.5,37.3,34.9,34.3]},
+  "國際觀光學士學位學程":{col:"國際學院",pr:[40.5,43.1,51.9,45.2,45.4,42.2,47.9,39.5,50.2,51.0,42.4,43.7,52.3,39.2,39.3,49.9]},
+  "國際廚藝學士學位學程":{col:"國際學院",pr:[47.3,57.8,51.4,43.5,45.9,41.6,48.6,46.2,44.4,47.0,44.3,50.0,51.2,48.7,45.8,53.0]}
+};
+
+// ══ 各系所 × 年級 ══
+const DEP_GRD={
+  "中餐廚藝系":    {"1年級":[44.5,42.4,36.4,37.3,33.4,40.4,40.2,40.5,38.1,41.2,38.7,35.9,42.0,41.1,38.1,36.7],"2年級":[29.3,43.6,30.9,32.1,24.8,28.3,29.7,30.3,30.0,30.4,27.5,29.3,35.7,34.0,26.0,32.0]},
+  "西餐廚藝系":    {"1年級":[51.5,57.0,43.3,48.0,48.4,49.0,50.2,47.4,46.5,46.3,47.3,49.5,52.9,50.5,46.5,50.1],"2年級":[38.2,41.3,34.1,33.5,30.5,35.9,39.5,37.5,32.4,32.8,33.3,31.3,35.6,34.8,34.8,32.9]},
+  "烘焙管理系":    {"1年級":[38.2,39.0,34.5,36.3,30.7,36.6,34.4,32.3,31.8,35.9,32.8,33.7,35.0,38.5,34.3,36.6],"2年級":[46.4,38.3,43.0,41.2,32.6,40.0,38.0,37.4,31.0,36.8,34.8,34.2,37.0,34.7,33.1,40.0]},
+  "旅館管理系":    {"1年級":[37.2,38.4,42.0,37.8,38.7,39.8,39.9,38.0,39.5,43.4,35.3,38.3,43.8,35.1,33.8,37.8],"2年級":[42.5,42.2,43.9,41.2,40.4,38.9,41.8,39.9,41.5,45.4,32.6,41.3,46.5,38.2,33.3,38.1]},
+  "餐飲管理系":    {"1年級":[37.5,37.5,40.1,35.2,34.0,36.5,37.1,36.8,33.7,38.6,34.8,37.0,39.8,36.9,32.9,37.0],"2年級":[41.5,44.5,42.9,39.5,36.5,40.3,39.9,40.5,34.9,42.6,37.1,37.8,42.6,39.6,37.4,39.7]},
+  "餐旅暨會展行銷管理系":{"1年級":[45.2,38.3,52.7,49.1,46.8,44.0,48.8,44.5,45.8,53.0,43.5,46.0,60.7,41.8,40.2,43.0],"2年級":[44.4,36.4,49.9,43.0,39.4,40.7,44.1,39.2,38.4,38.7,39.4,37.3,53.1,38.3,38.4,43.3]},
+  "旅運管理系":    {"1年級":[32.8,37.7,47.0,41.3,43.9,33.7,45.7,35.6,44.7,46.8,35.2,43.7,48.7,33.0,32.1,41.2],"2年級":[30.5,42.0,41.6,33.4,35.3,30.8,40.5,35.1,36.6,42.8,30.3,35.4,41.5,32.0,28.9,35.6]},
+  "休閒暨遊憩管理系":  {"1年級":[39.4,37.6,44.4,37.2,35.6,33.8,36.9,35.9,36.3,44.0,34.6,38.4,42.2,37.5,34.1,39.0],"2年級":[42.0,39.2,46.0,40.2,39.1,37.1,40.1,41.9,42.7,46.4,35.7,38.0,46.5,39.1,36.5,41.4]},
+  "航空暨運輸服務管理系":{"1年級":[40.5,35.5,45.1,38.4,39.6,36.7,46.1,38.6,45.5,49.2,38.8,41.1,43.1,40.0,37.6,43.9],"2年級":[44.4,45.1,47.4,43.4,43.2,42.0,48.5,43.6,47.9,52.5,38.9,46.4,46.5,44.5,39.5,48.9]},
+  "應用英語系":    {"1年級":[29.6,35.2,44.6,33.7,32.1,31.5,39.2,33.8,38.3,38.8,33.8,37.6,42.9,32.8,38.7,40.7],"2年級":[37.1,38.1,45.7,44.0,39.5,39.7,47.5,37.6,49.3,49.2,38.4,41.5,49.5,41.0,34.8,46.0]},
+  "應用日語系":    {"1年級":[32.8,36.2,48.6,34.3,27.8,35.4,39.4,29.8,36.3,38.7,37.2,33.0,39.8,39.1,37.2,33.6],"2年級":[30.4,30.9,49.7,34.8,29.6,34.7,37.3,31.8,33.6,44.8,32.5,34.6,38.6,33.3,29.8,35.7]},
+  "國際觀光學士學位學程":{"1年級":[37.6,45.4,51.3,43.4,43.6,40.1,45.3,37.8,49.4,48.2,40.1,44.1,55.7,35.5,37.3,49.0],"2年級":[49.7,35.8,53.8,51.0,51.4,48.8,56.4,45.0,52.6,59.9,49.6,42.4,41.4,51.2,45.6,52.7]},
+  "國際廚藝學士學位學程":{"1年級":[50.4,62.6,54.6,46.1,48.7,43.6,51.2,48.3,47.7,50.4,46.5,53.1,54.7,52.1,48.5,55.9],"2年級":[31.0,32.3,34.6,29.4,31.0,30.7,34.9,35.0,27.1,28.9,32.6,33.9,32.9,30.7,31.6,37.3]}
+};
+
+// ══ 配色 ══
+const COLS=["餐旅學院","觀光學院","廚藝學院","國際學院"];
+const CCOL={"餐旅學院":"#0a5a2e","觀光學院":"#2D8A5F","廚藝學院":"#c8a64b","國際學院":"#8B6914"};
+const GCOL={"1年級":"#0a5a2e","2年級":"#c8a64b"};
+const BPAL=["#0a5a2e","#2D8A5F","#c8a64b","#8B6914","#4DA882","#D4B85A","#3D7A5A","#A8814A","#5E9E75","#B8963C","#7DC4A0","#E0C878","#08471f","#9A7D1A","#50806A","#C8A845"];
+
+// ══ 狀態 ══
+let curCol="全部", curDep="全部", curGrd="全部", sortK="avgPR", sortA=false;
+const charts={};
+
+function deptsFor(col){
+  if(col==="全部") return Object.keys(DEP);
+  return Object.keys(DEP).filter(d=>DEP[d].col===col);
+}
+
+// 取得當前篩選的 PR 陣列
+function activePR(){
+  if(curDep!=="全部"){
+    if(curGrd!=="全部") return DEP_GRD[curDep][curGrd];
+    return DEP[curDep].pr;
+  }
+  if(curCol!=="全部"){
+    if(curGrd!=="全部") return COL_GRD[curCol][curGrd];
+    return COL[curCol];
+  }
+  if(curGrd!=="全部") return GRD[curGrd];
+  return OVERALL;
+}
+
+function avgArr(a){const v=a.filter(x=>x!=null&&!isNaN(x));return v.length?+(v.reduce((s,x)=>s+x,0)/v.length).toFixed(1):0;}
+
+function updateHint(){
+  let t=curDep!=="全部"?curDep:curCol!=="全部"?curCol:"全校";
+  if(curGrd!=="全部") t+=` · ${curGrd}`;
+  document.getElementById("hint").textContent=t;
+}
+
+// ══ 篩選器事件 ══
+function onCol(){
+  curCol=document.getElementById("selCol").value;
+  curDep="全部";
+  const ds=document.getElementById("selDep");
+  ds.innerHTML='<option>全部</option>';
+  deptsFor(curCol).sort().forEach(d=>{const o=document.createElement("option");o.text=d;ds.add(o);});
+  updateHint(); refresh();
+}
+function onDep(){curDep=document.getElementById("selDep").value; updateHint(); refresh();}
+function onGrd(){curGrd=document.getElementById("selGrd").value; updateHint(); refresh();}
+
+function refresh(){
+  const ci=[...document.querySelectorAll(".tab")].findIndex(t=>t.classList.contains("on"));
+  [drawP0,drawP1,drawP2][ci]&&[drawP0,drawP1,drawP2][ci]();
+}
+
+// ══ 頁籤 ══
+function gTab(i){
+  document.querySelectorAll(".tab").forEach((t,j)=>t.classList.toggle("on",i===j));
+  document.querySelectorAll(".pg").forEach((p,j)=>p.classList.toggle("on",i===j));
+  [drawP0,drawP1,drawP2][i]();
+}
+
+// ══ 圖表工廠 ══
+function mk(id,type,data,opts){
+  if(charts[id]){charts[id].destroy();delete charts[id];}
+  const c=document.getElementById(id);
+  if(!c) return;
+  charts[id]=new Chart(c,{type,data,options:{responsive:true,maintainAspectRatio:false,...opts}});
+}
+
+// ══════════════════════════════════════════
+// 頁 0 — 總覽
+// ══════════════════════════════════════════
+function drawP0(){
+  const pr=activePR();
+  const pairs=CN.map((n,i)=>({n,v:pr[i]})).sort((a,b)=>b.v-a.v);
+  const top=pairs[0], bot=pairs[pairs.length-1];
+  const mean=avgArr(pr);
+  const gap=+(top.v-bot.v).toFixed(1);
+  const lbl=curDep!=="全部"?curDep:curCol!=="全部"?curCol:"114年度全校";
+  const grdLbl=curGrd!=="全部"?` (${curGrd})`:"";
+
+  document.getElementById("p0").innerHTML=`
+<div class="g4">
+  <div class="kpi"><div class="lb">最高平均 PR 職涯類型</div><div class="nm">${top.n}</div><div class="vl">${top.v.toFixed(1)}</div></div>
+  <div class="kpi"><div class="lb">最低平均 PR 職涯類型</div><div class="nm">${bot.n}</div><div class="vl" style="color:#aaa">${bot.v.toFixed(1)}</div></div>
+  <div class="kpi"><div class="lb">16 類整體平均 PR 值</div><div class="nm" style="font-size:11px">（篩選範圍）</div><div class="vl" style="color:var(--g)">${mean}</div></div>
+  <div class="kpi"><div class="lb">最高 vs 最低差距</div><div class="nm" style="font-size:10px;line-height:1.5">${top.n} → ${bot.n}</div><div class="vl">${gap}</div></div>
+</div>
+<div class="g2">
+  <div class="card">
+    <div class="ct">${lbl}${grdLbl} UCAN 職涯興趣平均 PR 值（排序）</div>
+    <div style="position:relative;height:${pairs.length*30+36}px"><canvas id="barH"></canvas></div>
+  </div>
+  <div class="card">
+    <div class="ct">16 類職涯興趣雷達圖（${lbl}${grdLbl}）</div>
+    <div style="position:relative;height:340px"><canvas id="rad0"></canvas></div>
+  </div>
+</div>
+<div class="card">
+  <div class="ct">各學院 UCAN 職涯興趣比較（雷達圖）</div>
+  <div style="position:relative;height:380px"><canvas id="radCol"></canvas></div>
+  <div class="leg">${COLS.map(c=>`<span><i style="background:${CCOL[c]}"></i>${c}</span>`).join("")}</div>
+</div>`;
+
+  // 橫向長條
+  const rev=[...pairs].reverse();
+  mk("barH","bar",{
+    labels:rev.map(p=>p.n),
+    datasets:[{label:"平均PR值",data:rev.map(p=>p.v),backgroundColor:rev.map((_,i)=>BPAL[i%16]),borderRadius:3}]
+  },{indexAxis:"y",scales:{x:{min:0,max:100,ticks:{font:{size:10}},grid:{color:"#eee"}},y:{ticks:{font:{size:10}},grid:{display:false}}},
+     plugins:{legend:{display:false},tooltip:{callbacks:{label:i=>` 平均PR：${Number(i.raw).toFixed(1)}`}}}});
+
+  // 單一雷達
+  mk("rad0","radar",{
+    labels:CN,
+    datasets:[{label:lbl+grdLbl,data:pr,borderColor:"#0a5a2e",backgroundColor:"rgba(0,107,63,0.18)",pointBackgroundColor:"#0a5a2e",borderWidth:2}]
+  },{scales:{r:{min:0,max:80,ticks:{font:{size:8},stepSize:20},pointLabels:{font:{size:9}}}},
+     plugins:{legend:{display:false},tooltip:{callbacks:{label:i=>` ${Number(i.raw).toFixed(1)}`}}}});
+
+  // 各學院雷達（依年級篩選）
+  const colData=COLS.map(c=>({
+    label:c,
+    data:curGrd!=="全部"?COL_GRD[c][curGrd]:COL[c],
+    borderColor:CCOL[c],backgroundColor:CCOL[c]+"28",
+    pointBackgroundColor:CCOL[c],borderWidth:2,pointRadius:2
+  }));
+  mk("radCol","radar",{labels:CN,datasets:colData},{
+    scales:{r:{min:0,max:80,ticks:{font:{size:8},stepSize:20},pointLabels:{font:{size:9}}}},
+    plugins:{legend:{display:true,position:"bottom",labels:{font:{size:12},boxWidth:11,padding:14}}}});
+}
+
+// ══════════════════════════════════════════
+// 頁 1 — 學院・系所比較
+// ══════════════════════════════════════════
+function drawP1(){
+  const pr=activePR();
+  const lbl=(curDep!=="全部"?curDep:curCol!=="全部"?curCol:"全校")+(curGrd!=="全部"?` (${curGrd})`:"");
+  const depts=deptsFor(curCol).sort();
+  const deptAvgs=depts.map(d=>{
+    const p=curGrd!=="全部"?DEP_GRD[d][curGrd]:DEP[d].pr;
+    return {name:d,v:avgArr(p),col:DEP[d].col};
+  }).sort((a,b)=>b.v-a.v);
+
+  const diffSrc=(curDep!=="全部"||(curCol!=="全部")||curGrd!=="全部")?pr:null;
+  const refPR=curGrd!=="全部"?GRD[curGrd]:OVERALL;
+  const diffRows=diffSrc?CN.map((n,i)=>({n,diff:+(pr[i]-refPR[i]).toFixed(1)})).sort((a,b)=>b.diff-a.diff):[];
+  const showDiff=curDep!=="全部"||curCol!=="全部"||curGrd!=="全部";
+
+  // 各學院 vs 全校（帶年級）雷達資料
+  const gradeRadarData=["1年級","2年級"].map(g=>({
+    label:g,
+    data:GRD[g],
+    borderColor:GCOL[g],backgroundColor:GCOL[g]+"28",
+    pointBackgroundColor:GCOL[g],borderWidth:2,pointRadius:2
+  }));
+
+  // 右側雷達：系所→系所1/2年級；學院→學院1/2年級；都未選→全校1/2年級
+  let g1data, g2data, gradeColTitle;
+  if(curDep!=="全部"){
+    g1data=DEP_GRD[curDep]["1年級"];
+    g2data=DEP_GRD[curDep]["2年級"];
+    gradeColTitle=`${curDep}：1年級 vs 2年級`;
+  } else if(curCol!=="全部"){
+    g1data=COL_GRD[curCol]["1年級"];
+    g2data=COL_GRD[curCol]["2年級"];
+    gradeColTitle=`${curCol}：1年級 vs 2年級`;
+  } else {
+    g1data=GRD["1年級"];
+    g2data=GRD["2年級"];
+    gradeColTitle="全校：1年級 vs 2年級";
+  }
+
+  document.getElementById("p1").innerHTML=`
+<div class="card">
+  <div class="ct">各系所 UCAN 整體平均 PR 值（${curCol==="全部"?"全校":curCol}${curGrd!=="全部"?` · ${curGrd}`:""}）</div>
+  <div style="position:relative;height:${deptAvgs.length*30+46}px"><canvas id="dBar"></canvas></div>
+  <div class="leg">${COLS.map(c=>`<span><i style="background:${CCOL[c]}"></i>${c}</span>`).join("")}</div>
+</div>
+<div class="g2">
+  <div class="card">
+    <div class="ct">${lbl} vs ${curGrd!=="全部"?`全校${curGrd}`:"全校平均"}（雷達）</div>
+    <div style="position:relative;height:300px"><canvas id="rComp"></canvas></div>
+  </div>
+  <div class="card">
+    <div class="ct">${showDiff?lbl+" 與全校差異":"（請選擇學院、系所或年級以顯示差異）"}</div>
+    ${showDiff
+      ?`<div style="position:relative;height:${diffRows.length*26+40}px"><canvas id="diffBar"></canvas></div>`
+      :`<div style="height:100px;display:flex;align-items:center;justify-content:center;color:#bbb;font-size:13px;">請選擇學院、系所或年級</div>`}
+  </div>
+</div>
+<div class="g2">
+  <div class="card">
+    <div class="ct">各學院 1年級 vs 2年級 雷達比較</div>
+    <div style="position:relative;height:300px"><canvas id="radGrdCol"></canvas></div>
+    <div class="leg">${COLS.map(c=>`<span><i style="background:${CCOL[c]}"></i>${c}</span>`).join("")}</div>
+  </div>
+  <div class="card">
+    <div class="ct">${gradeColTitle}</div>
+    <div style="position:relative;height:300px"><canvas id="radGrd2"></canvas></div>
+    <div class="leg">
+      <span><i style="background:${GCOL["1年級"]}"></i>1年級</span>
+      <span><i style="background:${GCOL["2年級"]}"></i>2年級</span>
+    </div>
+  </div>
+</div>`;
+
+  // 系所橫向長條
+  mk("dBar","bar",{
+    labels:deptAvgs.map(d=>d.name),
+    datasets:[{label:"整體平均PR",data:deptAvgs.map(d=>d.v),backgroundColor:deptAvgs.map(d=>CCOL[d.col]||"#2D8A5F"),borderRadius:3}]
+  },{indexAxis:"y",scales:{x:{min:30,max:60,ticks:{font:{size:10}},grid:{color:"#eee"}},y:{ticks:{font:{size:10}},grid:{display:false}}},
+     plugins:{legend:{display:false},tooltip:{callbacks:{label:i=>` 整體平均PR：${Number(i.raw).toFixed(1)}`}}}});
+
+  // 比較雷達（選定 vs 全校）
+  mk("rComp","radar",{
+    labels:CN,
+    datasets:[
+      {label:lbl,data:pr,borderColor:"#c8a64b",backgroundColor:"rgba(201,162,39,0.18)",borderWidth:2,pointRadius:2},
+      {label:curGrd!=="全部"?`全校${curGrd}`:"全校平均",data:refPR,borderColor:"#0a5a2e",backgroundColor:"rgba(0,107,63,0.12)",borderWidth:1.5,pointRadius:2}
+    ]
+  },{scales:{r:{min:0,max:80,ticks:{font:{size:7},stepSize:20},pointLabels:{font:{size:8}}}},
+     plugins:{legend:{display:true,position:"bottom",labels:{font:{size:10},boxWidth:9,padding:10}}}});
+
+  // 差異長條
+  if(showDiff && diffRows.length){
+    mk("diffBar","bar",{
+      labels:diffRows.map(d=>d.n),
+      datasets:[{label:"差異",data:diffRows.map(d=>d.diff),backgroundColor:diffRows.map(d=>d.diff>=0?"#0a5a2e":"#c0614e"),borderRadius:3}]
+    },{indexAxis:"y",scales:{x:{min:-25,max:25,ticks:{font:{size:10},callback:v=>v>0?"+"+v:v},grid:{color:"#eee"}},y:{ticks:{font:{size:9}},grid:{display:false}}},
+       plugins:{legend:{display:false},tooltip:{callbacks:{label:i=>` ${Number(i.raw)>0?"+":""}${Number(i.raw).toFixed(1)}`}}}});
+  }
+
+  // 各學院 1年級 vs 2年級 疊加雷達（4學院各自用1色實線+虛線）
+  const grdColDs=[];
+  COLS.forEach(c=>{
+    grdColDs.push({label:`${c} 1年級`,data:COL_GRD[c]["1年級"],borderColor:CCOL[c],backgroundColor:"transparent",borderWidth:2,pointRadius:1,borderDash:[]});
+    grdColDs.push({label:`${c} 2年級`,data:COL_GRD[c]["2年級"],borderColor:CCOL[c],backgroundColor:"transparent",borderWidth:1.5,pointRadius:1,borderDash:[5,4]});
+  });
+  mk("radGrdCol","radar",{labels:CN,datasets:grdColDs},{
+    scales:{r:{min:0,max:80,ticks:{font:{size:7},stepSize:20},pointLabels:{font:{size:8}}}},
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:i=>` ${i.dataset.label}：${Number(i.raw).toFixed(1)}`}}}});
+
+  // 選定學院（或全校）的 1年級 vs 2年級
+  mk("radGrd2","radar",{
+    labels:CN,
+    datasets:[
+      {label:"1年級",data:g1data,borderColor:GCOL["1年級"],backgroundColor:"rgba(0,107,63,0.18)",borderWidth:2,pointRadius:2},
+      {label:"2年級",data:g2data,borderColor:GCOL["2年級"],backgroundColor:"rgba(201,162,39,0.18)",borderWidth:2,pointRadius:2}
+    ]
+  },{scales:{r:{min:0,max:80,ticks:{font:{size:7},stepSize:20},pointLabels:{font:{size:8}}}},
+     plugins:{legend:{display:true,position:"bottom",labels:{font:{size:11},boxWidth:10,padding:10}}}});
+}
+
+// ══════════════════════════════════════════
+// 頁 2 — 資料表
+// ══════════════════════════════════════════
+function drawP2(){
+  const depts=curDep!=="全部"?[curDep]:deptsFor(curCol);
+  let rows=[];
+  depts.sort().forEach(d=>{
+    CN.forEach((n,i)=>{
+      if(curGrd!=="全部"){
+        rows.push({yr:114,col:DEP[d].col,dep:d,grade:curGrd,ct:n,avgPR:DEP_GRD[d][curGrd][i]});
+      } else {
+        ["1年級","2年級"].forEach(g=>{
+          rows.push({yr:114,col:DEP[d].col,dep:d,grade:g,ct:n,avgPR:DEP_GRD[d][g][i]});
+        });
+      }
+    });
+  });
+  rows.sort((a,b)=>{
+    if(sortK==="avgPR") return sortA?a.avgPR-b.avgPR:b.avgPR-a.avgPR;
+    const va=String(a[sortK]), vb=String(b[sortK]);
+    return sortA?va.localeCompare(vb,"zh-TW"):vb.localeCompare(va,"zh-TW");
+  });
+
+  document.getElementById("p2").innerHTML=`
+<div class="card">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+    <div class="ct" style="margin:0">篩選後彙整資料表</div>
+    <button onclick="dlCSV()" style="font-size:12px;padding:5px 14px;background:var(--g);color:#fff;border:none;border-radius:6px;cursor:pointer">匯出 CSV</button>
+  </div>
+  <div style="overflow-x:auto;max-height:520px;overflow-y:auto">
+    <table>
+      <thead><tr>
+        ${[["學年度","yr"],["學院","col"],["系所","dep"],["年級","grade"],["職涯類型","ct"],["平均 PR 值","avgPR"]].map(([l,k])=>
+          `<th onclick="srt('${k}')">${l}${sortK===k?(sortA?" ▲":" ▼"):""}</th>`).join("")}
+      </tr></thead>
+      <tbody>${rows.map((r,idx)=>`
+        <tr style="background:${idx%2===0?"#fff":"var(--lg)"}">
+          <td>${r.yr}</td>
+          <td style="color:${CCOL[r.col]||"var(--g)"};font-weight:600">${r.col}</td>
+          <td>${r.dep}</td>
+          <td style="color:${GCOL[r.grade]};font-weight:600">${r.grade}</td>
+          <td>${r.ct}</td>
+          <td style="font-weight:700;color:${r.avgPR>=50?"var(--gd)":"var(--g)"}">${r.avgPR.toFixed(1)}</td>
+        </tr>`).join("")}
+      </tbody>
+    </table>
+  </div>
+  <div style="font-size:11px;color:#bbb;margin-top:8px">共 ${rows.length} 筆｜依系所、年級與職涯類型彙整，不含個別學生資料</div>
+</div>`;
+}
+
+function srt(k){if(sortK===k){sortA=!sortA;}else{sortK=k;sortA=false;}drawP2();}
+function dlCSV(){
+  const depts=curDep!=="全部"?[curDep]:deptsFor(curCol);
+  let r=[["學年度","學院","系所","年級","職涯類型","平均PR值"]];
+  depts.sort().forEach(d=>{
+    CN.forEach((n,i)=>{
+      if(curGrd!=="全部"){
+        r.push([114,DEP[d].col,d,curGrd,n,DEP_GRD[d][curGrd][i].toFixed(1)]);
+      } else {
+        ["1年級","2年級"].forEach(g=>r.push([114,DEP[d].col,d,g,n,DEP_GRD[d][g][i].toFixed(1)]));
+      }
+    });
+  });
+  const a=document.createElement("a");
+  a.href="data:text/csv;charset=utf-8,\uFEFF"+encodeURIComponent(r.map(l=>l.join(",")).join("\n"));
+  a.download="UCAN_職涯興趣.csv"; a.click();
+}
+
+// 初始化
+drawP0();
+</script>
+</body>
+</html>

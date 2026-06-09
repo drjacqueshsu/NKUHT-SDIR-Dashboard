@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght;500;700;900&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>114年高教深耕計畫經費分析概況</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  :root {
+    --blue: #0a5a2e; --blue-l: #156c3a; --blue-xl: #bfe0cd;
+    --teal: #1D9E75; --teal-l: #5DCAA5; --teal-xl: #9FE1CB;
+    --amber: #BA7517; --amber-l: #EF9F27; --amber-xl: #FAC775;
+    --coral: #D85A30; --coral-l: #F0997B; --coral-xl: #F5C4B3;
+    --purple: #534AB7; --purple-l: #7F77DD; --purple-xl: #AFA9EC;
+    --gray: #5F5E5A; --gray-l: #888780; --gray-xl: #D3D1C7;
+    --green: #3B6D11; --green-l: #639922; --green-xl: #C0DD97;
+    --pink: #993556; --pink-l: #D4537E;
+    --bg: #f8f7f5; --surface: #ffffff; --surface2: #f1efe8;
+    --text: #1a1a18; --text2: #5f5e5a; --text3: #888780;
+    --border: rgba(0,0,0,0.1); --border2: rgba(0,0,0,0.06);
+    --radius: 10px; --radius-sm: 6px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif; background: var(--bg); color: var(--text); font-size: 14px; line-height: 1.6; }
+  .page { max-width: 1100px; margin: 0 auto; padding: 32px 24px 64px; }
+  .page-header { margin-bottom: 32px; padding-bottom: 20px; border-bottom: 1px solid var(--border); }
+  .page-title { font-size: 22px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+  .page-meta { font-size: 12px; color: var(--text3); display: flex; gap: 20px; flex-wrap: wrap; }
+  .page-meta span { display: flex; align-items: center; gap: 4px; }
+
+  .section { margin-bottom: 40px; background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border2); overflow: hidden; }
+  .section-header { padding: 16px 20px 12px; border-bottom: 1px solid var(--border2); display: flex; align-items: flex-start; gap: 12px; }
+  .section-num { width: 28px; height: 28px; border-radius: 50%; background: var(--blue); color: #fff; font-size: 13px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+  .section-info { flex: 1; }
+  .section-title { font-size: 15px; font-weight: 600; color: var(--text); }
+  .section-src { font-size: 11px; color: var(--text3); margin-top: 3px; }
+  .section-body { padding: 20px; }
+
+  .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 20px; }
+  .metric { background: var(--surface2); border-radius: var(--radius-sm); padding: 12px 14px; }
+  .metric-lbl { font-size: 11px; color: var(--text3); margin-bottom: 4px; }
+  .metric-val { font-size: 20px; font-weight: 600; color: var(--text); line-height: 1.2; }
+  .metric-sub { font-size: 11px; color: var(--text2); margin-top: 3px; }
+  .metric-up { color: var(--teal); }
+  .metric-dn { color: var(--coral); }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+  @media (max-width: 700px) { .two-col, .three-col { grid-template-columns: 1fr; } }
+
+  .chart-box { }
+  .chart-lbl { font-size: 12px; color: var(--text2); font-weight: 500; margin-bottom: 8px; }
+  .chart-wrap { position: relative; width: 100%; }
+
+  .legend { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 8px; }
+  .legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text2); }
+  .legend-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+  .legend-line { width: 14px; height: 2px; flex-shrink: 0; }
+
+  .divider { height: 1px; background: var(--border2); margin: 20px 0; }
+
+  /* Per-student table */
+  .data-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  .data-table th { background: var(--surface2); color: var(--text2); font-weight: 600; padding: 8px 10px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  .data-table th.right, .data-table td.right { text-align: right; }
+  .data-table tr:nth-child(even) td { background: var(--surface2); }
+  .data-table td { padding: 7px 10px; border-bottom: 1px solid var(--border2); vertical-align: middle; }
+  .data-table .val-blue { color: var(--blue); font-weight: 600; }
+  .bar-cell { display: flex; align-items: center; gap: 8px; }
+  .mini-bar-bg { flex: 1; height: 6px; background: var(--gray-xl); border-radius: 3px; overflow: hidden; }
+  .mini-bar-fill { height: 100%; border-radius: 3px; }
+  .type-badge { display: inline-block; padding: 2px 7px; border-radius: 10px; font-size: 10px; font-weight: 500; white-space: nowrap; }
+  .badge-blue { background: #dce8f7; color: var(--blue); }
+  .badge-teal { background: #d0f0e5; color: #0f6e56; }
+  .badge-amber { background: #faeeda; color: #854F0B; }
+
+  .callout { background: #e6f1fb; border-left: 3px solid var(--blue); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; padding: 10px 14px; margin-top: 14px; font-size: 12px; color: #0C447C; line-height: 1.7; }
+  .callout-title { font-weight: 600; margin-bottom: 4px; }
+
+  .footer { text-align: center; font-size: 11px; color: var(--text3); margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border2); }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="page-header">
+    <div class="page-title">114年高教深耕計畫經費分析概況</div>
+    <div class="page-meta">
+      <span>🏫 國立高雄餐旅大學 校務研究辦公室</span>
+      <span>📅 資料期間：114年度（113-2 至 114-1 學期）</span>
+      <span>📊 製作日期：2026年5月</span>
+    </div>
+  </div>
+
+  <!-- 一、經費現況 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">一</div>
+      <div class="section-info">
+        <div class="section-title">114年度高教深耕計畫經費現況分析</div>
+        <div class="section-src">資料來源：主計室－高教深耕計畫統計</div>
+      </div>
+    </div>
+    <div class="section-body">
+      <div class="metrics">
+        <div class="metric"><div class="metric-lbl">總核定經費</div><div class="metric-val">6,991萬元</div><div class="metric-sub">四冊合計</div></div>
+        <div class="metric"><div class="metric-lbl">主冊（114K01）</div><div class="metric-val">5,008萬元</div><div class="metric-sub">占 66.9%</div></div>
+        <div class="metric"><div class="metric-lbl">USR附冊（114K02）</div><div class="metric-val">1,650萬元</div><div class="metric-sub">占 22.0%</div></div>
+        <div class="metric"><div class="metric-lbl">附錄合計</div><div class="metric-val">333萬元</div><div class="metric-sub">占 4.8%（K03+K04）</div></div>
+        <div class="metric"><div class="metric-lbl">主冊+USR合計</div><div class="metric-val">88.9%</div><div class="metric-sub">資源高度集中</div></div>
+      </div>
+      <div class="two-col">
+        <div class="chart-box">
+          <div class="chart-lbl">四冊經費占比</div>
+          <div class="legend">
+            <div class="legend-item"><div class="legend-dot" style="background:#185FA5"></div>主冊 66.9%</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#1D9E75"></div>USR附冊 22.0%</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#BA7517"></div>附錄一 3.1%</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#D85A30"></div>附錄二 1.7%</div>
+          </div>
+          <div class="chart-wrap" style="height:200px"><canvas id="c1" role="img" aria-label="四冊經費圓餅圖">主冊5008萬、USR附冊1650萬、附錄一217.7萬、附錄二115.7萬</canvas></div>
+        </div>
+        <div class="chart-box">
+          <div class="chart-lbl">主冊經費用途結構</div>
+          <div class="legend">
+            <div class="legend-item"><div class="legend-dot" style="background:#185FA5"></div>A教學創新 25.6%</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#3B6D11"></div>人事費 24.9%</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#BA7517"></div>資本門 14.3%</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#888780"></div>業務費(綜行) 11.9%</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#1D9E75"></div>C產學連結 11.6%</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#534AB7"></div>D公共性 5.7%</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#993556"></div>B社會責任 4.2%</div>
+          </div>
+          <div class="chart-wrap" style="height:200px"><canvas id="c2" role="img" aria-label="主冊經費用途圓餅圖">業務費A25.6%、人事費24.9%、資本門14.3%</canvas></div>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="chart-box">
+        <div class="chart-lbl">主冊四大面向業務費比較（萬元）</div>
+        <div class="legend">
+          <div class="legend-item"><div class="legend-dot" style="background:#185FA5"></div>A 教學創新精進</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#1D9E75"></div>C 產學合作連結</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#534AB7"></div>D 提升高教公共性</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#D85A30"></div>B 善盡社會責任</div>
+        </div>
+        <div class="chart-wrap" style="height:180px"><canvas id="c3" role="img" aria-label="四大面向業務費長條圖">A面向1283萬、C面向582萬、D面向287萬、B面向211萬</canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 二、資本門 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num" style="background:var(--amber)">二</div>
+      <div class="section-info">
+        <div class="section-title">114年度高教深耕計畫──資本門經費投入分析</div>
+        <div class="section-src">資料來源：主計室－114年教育部深耕計畫－計畫統計表；校基庫表4-2各年級實際在學學生人數</div>
+      </div>
+    </div>
+    <div class="section-body">
+      <div class="metrics">
+        <div class="metric"><div class="metric-lbl">資本門總採購金額</div><div class="metric-val">766.2萬元</div><div class="metric-sub">14個執行單位</div></div>
+        <div class="metric"><div class="metric-lbl">全校在學學生數</div><div class="metric-val">3,972人</div><div class="metric-sub">114年度</div></div>
+        <div class="metric"><div class="metric-lbl">每生平均資本門</div><div class="metric-val">≈1,929元</div><div class="metric-sub">以有採購之單位計</div></div>
+        <div class="metric"><div class="metric-lbl">最高每生均費單位</div><div class="metric-val">食創所</div><div class="metric-sub">$10,603元/生</div></div>
+      </div>
+
+      <div class="chart-box" style="margin-bottom:20px">
+        <div class="chart-lbl">各執行單位資本門實際報銷金額（元）</div>
+        <div class="chart-wrap" style="height:380px"><canvas id="c4" role="img" aria-label="各單位資本門採購金額水平長條圖">烘焙系82.2萬最高，廚藝科60.9萬，旅館系50萬等</canvas></div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="chart-box" style="margin-bottom:20px">
+        <div class="chart-lbl">各執行單位每生平均資本門經費（元）── 依在學學生人數計算</div>
+        <div class="chart-wrap" style="height:380px"><canvas id="c4b" role="img" aria-label="各單位每生平均資本門經費水平長條圖">食創所10603元最高，全英碩6439元，烘焙系4152元等"></canvas></div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Per-student detail table -->
+      <div class="chart-lbl" style="margin-bottom:10px">各執行單位資本門採購詳細對照表（依每生平均由高至低排序）</div>
+      <div style="overflow-x:auto">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>執行單位</th>
+              <th>對應系所</th>
+              <th class="right">在學學生數</th>
+              <th class="right">實際報銷數（元）</th>
+              <th class="right">占全經費比率</th>
+              <th class="right">每生平均（元）</th>
+              <th>相對高低</th>
+              <th>採購類型</th>
+            </tr>
+          </thead>
+          <tbody id="capitalTable"></tbody>
+        </table>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="two-col">
+        <div class="chart-box">
+          <div class="chart-lbl">採購類型結構分布</div>
+          <div class="legend">
+            <div class="legend-item"><div class="legend-dot" style="background:#185FA5"></div>高度專業實作型</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#1D9E75"></div>基礎教學優化型</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#BA7517"></div>數位/科研前瞻型</div>
+          </div>
+          <div class="chart-wrap" style="height:200px"><canvas id="c5" role="img" aria-label="資本門採購類型分布圓餅圖">高度專業實作型為大宗</canvas></div>
+        </div>
+        <div class="chart-box">
+          <div class="chart-lbl">每生平均資本門 vs. 採購金額（各單位對比）</div>
+          <div class="legend">
+            <div class="legend-item"><div class="legend-dot" style="background:#534AB7"></div>採購金額（萬元）</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#D85A30"></div>每生平均（千元）</div>
+          </div>
+          <div class="chart-wrap" style="height:200px"><canvas id="c4c" role="img" aria-label="採購金額與每生均費比較折線圖"></canvas></div>
+        </div>
+      </div>
+
+      <div class="callout">
+        <div class="callout-title">📌 解讀提示</div>
+        食創所每生平均（$10,603）與烘焙系採購金額最高（$822,000），兩者呈現不同樣態：食創所以少量學生使用高單價研究設備（腦波平台 $363,889），每生成本偏高；烘焙系採購攪拌機等實作設備惠及198名學生，每生均費相對合理（$4,152）。建議後續追蹤「設備實際使用學生數」以補強覆蓋率分析。
+      </div>
+    </div>
+  </div>
+
+  <!-- 三、移地訓練 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num" style="background:var(--teal)">三</div>
+      <div class="section-info">
+        <div class="section-title">114年度高教深耕計畫──移地訓練人次投入分析</div>
+        <div class="section-src">資料來源：高教深耕辦公室114年度成果彙整－移地訓練；校基庫表1-1、表4-2</div>
+      </div>
+    </div>
+    <div class="section-body">
+      <div class="metrics">
+        <div class="metric"><div class="metric-lbl">活動場次</div><div class="metric-val">33場</div></div>
+        <div class="metric"><div class="metric-lbl">教師參與人次</div><div class="metric-val">55人次</div><div class="metric-sub">教師覆蓋率 36.4%</div></div>
+        <div class="metric"><div class="metric-lbl">學生參與人次</div><div class="metric-val">1,102人次</div><div class="metric-sub">學生覆蓋率 27.7%</div></div>
+        <div class="metric"><div class="metric-lbl">總參與人次</div><div class="metric-val">1,192人次</div></div>
+        <div class="metric"><div class="metric-lbl">校外人士比率</div><div class="metric-val">2.9%</div><div class="metric-sub">35人次</div></div>
+      </div>
+      <div class="two-col">
+        <div class="chart-box">
+          <div class="chart-lbl">各學院教師與學生參與人次</div>
+          <div class="legend">
+            <div class="legend-item"><div class="legend-dot" style="background:#185FA5"></div>教師人次</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#1D9E7599"></div>學生人次</div>
+          </div>
+          <div class="chart-wrap" style="height:240px"><canvas id="c6" role="img" aria-label="各學院移地訓練參與人次長條圖"></canvas></div>
+        </div>
+        <div class="chart-box">
+          <div class="chart-lbl">學生人次各學院占比</div>
+          <div class="legend">
+            <div class="legend-item"><div class="legend-dot" style="background:#185FA5"></div>廚藝學院 32.7%</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#1D9E75"></div>餐旅學院 26.8%</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#BA7517"></div>通識中心 19.9%</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#D85A30"></div>觀光學院 13.2%</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#534AB7"></div>國際學院 7.5%</div>
+          </div>
+          <div class="chart-wrap" style="height:240px"><canvas id="c7" role="img" aria-label="各學院學生人次占比圓餅圖"></canvas></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 四、活動 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num" style="background:var(--coral)">四</div>
+      <div class="section-info">
+        <div class="section-title">114年度高教深耕計畫──活動</div>
+        <div class="section-src">資料來源：114年度高教深耕成果彙總－活動（高教深耕辦公室）</div>
+      </div>
+    </div>
+    <div class="section-body">
+      <div class="metrics">
+        <div class="metric"><div class="metric-lbl">活動總場次</div><div class="metric-val">488場</div></div>
+        <div class="metric"><div class="metric-lbl">總參與人次</div><div class="metric-val">34,765人次</div></div>
+        <div class="metric"><div class="metric-lbl">學生占比</div><div class="metric-val">63.0%</div><div class="metric-sub">21,890人次</div></div>
+        <div class="metric"><div class="metric-lbl">校外人士</div><div class="metric-val">22.2%</div><div class="metric-sub">7,710人次</div></div>
+        <div class="metric"><div class="metric-lbl">教師參與</div><div class="metric-val">12.3%</div><div class="metric-sub">4,279人次</div></div>
+      </div>
+      <div class="two-col">
+        <div class="chart-box">
+          <div class="chart-lbl">參與身分別組成</div>
+          <div class="legend">
+            <div class="legend-item"><div class="legend-dot" style="background:#185FA5"></div>學生 63.0%</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#1D9E75"></div>校外人士 22.2%</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#BA7517"></div>教師 12.3%</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#888780"></div>職員 2.5%</div>
+          </div>
+          <div class="chart-wrap" style="height:200px"><canvas id="c8" role="img" aria-label="活動身分別圓餅圖"></canvas></div>
+        </div>
+        <div class="chart-box">
+          <div class="chart-lbl">四大面向參與人次（堆疊）</div>
+          <div class="legend">
+            <div class="legend-item"><div class="legend-dot" style="background:#185FA5"></div>學生</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#1D9E75"></div>教師</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#D85A30"></div>校外人士</div>
+          </div>
+          <div class="chart-wrap" style="height:200px"><canvas id="c9" role="img" aria-label="四大面向參與人次堆疊圖"></canvas></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 五、業師協同 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num" style="background:var(--purple)">五</div>
+      <div class="section-info">
+        <div class="section-title">業界專家協同教學課程</div>
+        <div class="section-src">資料來源：校基庫表3-5業師協同教學補助明細、表3-7全校課程修課人次資料（教發中心）</div>
+      </div>
+    </div>
+    <div class="section-body">
+      <div class="metrics">
+        <div class="metric"><div class="metric-lbl">受補助課程數</div><div class="metric-val">240門</div></div>
+        <div class="metric"><div class="metric-lbl">全校課程覆蓋率</div><div class="metric-val">10.46%</div><div class="metric-sub">240 / 2,294門</div></div>
+        <div class="metric"><div class="metric-lbl">修課人次覆蓋率</div><div class="metric-val">11.05%</div><div class="metric-sub">7,671 / 69,433人次</div></div>
+        <div class="metric"><div class="metric-lbl">補助總額</div><div class="metric-val">165.9萬元</div></div>
+        <div class="metric"><div class="metric-lbl">每門課平均補助</div><div class="metric-val">6,913元</div></div>
+        <div class="metric"><div class="metric-lbl">每修課人次補助</div><div class="metric-val">216元</div></div>
+      </div>
+      <div class="chart-box">
+        <div class="chart-lbl">各學院業師協同教學學生人次覆蓋率</div>
+        <div class="chart-wrap" style="height:220px"><canvas id="c10" role="img" aria-label="各學院業師協同覆蓋率長條圖"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 六、教學助教 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num" style="background:var(--green)">六</div>
+      <div class="section-info">
+        <div class="section-title">教學助教課程</div>
+        <div class="section-src">資料來源：教發中心TA申請統計表（113-2、114-1學期）</div>
+      </div>
+    </div>
+    <div class="section-body">
+      <div class="metrics">
+        <div class="metric"><div class="metric-lbl">兩學期助學金總額</div><div class="metric-val">256.7萬元</div></div>
+        <div class="metric"><div class="metric-lbl">113-2申請筆數</div><div class="metric-val">250筆</div></div>
+        <div class="metric"><div class="metric-lbl">114-1申請筆數</div><div class="metric-val">238筆</div><div class="metric-sub metric-dn">↓ 4.8%</div></div>
+        <div class="metric"><div class="metric-lbl">TA課程覆蓋率（合計）</div><div class="metric-val">21.19%</div><div class="metric-sub">486 / 2,294門</div></div>
+        <div class="metric"><div class="metric-lbl">修課人次覆蓋率</div><div class="metric-val">22.10%</div><div class="metric-sub">15,345 / 69,433人次</div></div>
+        <div class="metric"><div class="metric-lbl">TA學生參與覆蓋率</div><div class="metric-val">6.95%</div><div class="metric-sub">不重複 276 / 3,972人</div></div>
+      </div>
+      <div class="two-col">
+        <div class="chart-box">
+          <div class="chart-lbl">各學院TA助學金占比</div>
+          <div class="legend">
+            <div class="legend-item"><div class="legend-dot" style="background:#185FA5"></div>餐旅 29.4%</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#1D9E75"></div>廚藝 25.4%</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#BA7517"></div>國際 18.3%</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#D85A30"></div>觀光 13.8%</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#888780"></div>共教 13.1%</div>
+          </div>
+          <div class="chart-wrap" style="height:200px"><canvas id="c11" role="img" aria-label="各學院TA助學金占比圓餅圖"></canvas></div>
+        </div>
+        <div class="chart-box">
+          <div class="chart-lbl">各學院TA課程覆蓋率雷達圖</div>
+          <div class="legend">
+            <div class="legend-item"><div class="legend-dot" style="background:#185FA5"></div>TA課程覆蓋率</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#D85A30"></div>修課人次覆蓋率</div>
+          </div>
+          <div class="chart-wrap" style="height:200px"><canvas id="c12" role="img" aria-label="TA覆蓋率雷達圖"></canvas></div>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="chart-box">
+        <div class="chart-lbl">各學院兩學期TA修課人次覆蓋率比較</div>
+        <div class="legend">
+          <div class="legend-item"><div class="legend-dot" style="background:#185FA5"></div>113-2學期</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#1D9E75"></div>114-1學期</div>
+        </div>
+        <div class="chart-wrap" style="height:220px"><canvas id="c13" role="img" aria-label="兩學期TA修課人次覆蓋率分組長條圖"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    114年高教深耕計畫經費分析概況　｜　國立高雄餐旅大學 校務研究辦公室　｜　2026年5月製作
+  </div>
+</div>
+
+<script>
+const f={family:"'Noto Sans TC','PingFang TC','Microsoft JhengHei',sans-serif",size:12};
+const baseOpts={responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},font:f};
+function gscale(ctx){const d=ctx.createLinearGradient(0,0,ctx.canvas.width,0);return d;}
+
+// 1a. Four books pie
+new Chart(document.getElementById('c1'),{type:'doughnut',data:{labels:['主冊 66.9%','USR附冊 22.0%','附錄一 3.1%','附錄二 1.7%'],datasets:[{data:[50080000,16500000,2177000,1157011],backgroundColor:['#185FA5','#1D9E75','#BA7517','#D85A30'],borderWidth:2,borderColor:'#fff'}]},options:{...baseOpts,cutout:'60%'}});
+// 1b. Budget pie
+new Chart(document.getElementById('c2'),{type:'doughnut',data:{labels:['A教學創新 25.6%','人事費 24.9%','資本門 14.3%','業務費(綜行) 11.9%','C產學連結 11.6%','D公共性 5.7%','B社會責任 4.2%','其他 2.0%'],datasets:[{data:[12825381,12477550,7150000,5947079,5820920,2866066,2109518,740992],backgroundColor:['#185FA5','#3B6D11','#BA7517','#888780','#1D9E75','#534AB7','#993556','#D85A30'],borderWidth:2,borderColor:'#fff'}]},options:{...baseOpts,cutout:'60%'}});
+// 1c. Four dimensions bar
+new Chart(document.getElementById('c3'),{type:'bar',data:{labels:['A 教學創新精進（55.4%）','C 產學合作連結（25.1%）','D 提升高教公共性（12.4%）','B 善盡社會責任（9.1%）'],datasets:[{data:[1283,582,287,211],backgroundColor:['#185FA5','#1D9E75','#534AB7','#D85A30'],borderRadius:4}]},options:{...baseOpts,indexAxis:'y',scales:{x:{ticks:{font:f,color:'#888780',callback:v=>v+'萬'},grid:{color:'rgba(0,0,0,0.06)'}},y:{ticks:{font:f,color:'#5f5e5a'}}}}});
+
+// Capital data from screenshot
+const capData=[
+  {unit:'食創所',dept:'飲食文化暨餐飲創新研究所',students:67,amount:710389,ratio:9.27,perStudent:10603,type:'high'},
+  {unit:'全英碩',dept:'國際觀光餐旅全英文碩士學位學程',students:31,amount:199603,ratio:2.61,perStudent:6439,type:'digital'},
+  {unit:'烘焙系',dept:'烘焙管理系',students:198,amount:822000,ratio:10.73,perStudent:4152,type:'high'},
+  {unit:'觀光所',dept:'觀光研究所',students:71,amount:199179,ratio:2.60,perStudent:2805,type:'digital'},
+  {unit:'廚藝科',dept:'餐飲廚藝科',students:252,amount:609460,ratio:7.95,perStudent:2418,type:'high'},
+  {unit:'餐飲管理系',dept:'餐飲管理系（含國際專修部）',students:753,amount:1601699,ratio:20.90,perStudent:2127,type:'basic'},
+  {unit:'中廚系',dept:'中餐廚藝系',students:203,amount:408582,ratio:5.33,perStudent:2013,type:'high'},
+  {unit:'旅運系',dept:'旅運管理系（含國際專修部）',students:251,amount:499990,ratio:6.53,perStudent:1992,type:'digital'},
+  {unit:'西廚系',dept:'西餐廚藝系',students:191,amount:298000,ratio:3.89,perStudent:1560,type:'high'},
+  {unit:'旅館系',dept:'旅館管理系（含國際專修部）',students:509,amount:500000,ratio:6.53,perStudent:982,type:'basic'},
+  {unit:'行銷系',dept:'餐旅暨會展行銷管理系',students:201,amount:149583,ratio:1.95,perStudent:744,type:'basic'},
+  {unit:'應英系',dept:'應用英語系',students:148,amount:107595,ratio:1.40,perStudent:727,type:'basic'},
+  {unit:'國廚學程',dept:'國際廚藝學士學位學程',students:123,amount:73500,ratio:0.96,perStudent:598,type:'high'},
+  {unit:'航運系',dept:'航空暨運輸服務管理系',students:364,amount:145000,ratio:1.89,perStudent:398,type:'digital'},
+];
+const maxAmount=Math.max(...capData.map(d=>d.amount));
+const maxPerStudent=Math.max(...capData.map(d=>d.perStudent));
+const typeLabel={high:'高度專業實作型',basic:'基礎教學優化型',digital:'數位/科研前瞻型'};
+const typeClass={high:'badge-blue',basic:'badge-teal',digital:'badge-amber'};
+const tbody=document.getElementById('capitalTable');
+capData.forEach(d=>{
+  const pct=Math.round(d.perStudent/maxPerStudent*100);
+  const barColor=d.perStudent>5000?'#185FA5':d.perStudent>2000?'#BA7517':'#1D9E75';
+  const row=`<tr>
+    <td><strong>${d.unit}</strong></td>
+    <td style="color:#888780;font-size:11px">${d.dept}</td>
+    <td class="right">${d.students.toLocaleString()}</td>
+    <td class="right">$${d.amount.toLocaleString()}</td>
+    <td class="right">${d.ratio}%</td>
+    <td class="right val-blue">$${d.perStudent.toLocaleString()}</td>
+    <td><div class="bar-cell"><div class="mini-bar-bg"><div class="mini-bar-fill" style="width:${pct}%;background:${barColor}"></div></div><span style="font-size:11px;color:#888780;min-width:30px">${pct}%</span></div></td>
+    <td><span class="type-badge ${typeClass[d.type]}">${typeLabel[d.type]}</span></td>
+  </tr>`;
+  tbody.insertAdjacentHTML('beforeend',row);
+});
+
+// 2a. Amount bar
+const capSorted=[...capData].sort((a,b)=>a.amount-b.amount);
+new Chart(document.getElementById('c4'),{type:'bar',data:{labels:capSorted.map(d=>d.unit),datasets:[{data:capSorted.map(d=>d.amount),backgroundColor:capSorted.map(d=>d.type==='high'?'#185FA5':d.type==='digital'?'#BA7517':'#1D9E75'),borderRadius:3}]},options:{...baseOpts,indexAxis:'y',scales:{x:{ticks:{font:f,color:'#888780',callback:v=>'$'+(v/10000).toFixed(0)+'萬'},grid:{color:'rgba(0,0,0,0.06)'}},y:{ticks:{font:f,color:'#5f5e5a'}}}}});
+
+// 2b. Per-student bar (sorted)
+const capSortedPS=[...capData].sort((a,b)=>a.perStudent-b.perStudent);
+new Chart(document.getElementById('c4b'),{type:'bar',data:{labels:capSortedPS.map(d=>d.unit),datasets:[{data:capSortedPS.map(d=>d.perStudent),backgroundColor:capSortedPS.map(d=>d.perStudent>5000?'#534AB7':d.perStudent>2000?'#185FA5':'#1D9E75'),borderRadius:3}]},options:{...baseOpts,indexAxis:'y',scales:{x:{ticks:{font:f,color:'#888780',callback:v=>'$'+v.toLocaleString()},grid:{color:'rgba(0,0,0,0.06)'}},y:{ticks:{font:f,color:'#5f5e5a'}}},plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' $'+c.raw.toLocaleString()+' 元/生'}}}}});
+
+// 2c. Type pie
+const typeCounts={high:0,basic:0,digital:0};
+capData.forEach(d=>{typeCounts[d.type]+=d.amount;});
+new Chart(document.getElementById('c5'),{type:'doughnut',data:{labels:['高度專業實作型','基礎教學優化型','數位/科研前瞻型'],datasets:[{data:[typeCounts.high,typeCounts.basic,typeCounts.digital],backgroundColor:['#185FA5','#1D9E75','#BA7517'],borderWidth:2,borderColor:'#fff'}]},options:{...baseOpts,cutout:'55%'}});
+
+// 2d. Dual axis combo
+const capTop6=[...capData].sort((a,b)=>b.amount-a.amount).slice(0,6);
+new Chart(document.getElementById('c4c'),{type:'bar',data:{labels:capTop6.map(d=>d.unit),datasets:[{type:'bar',label:'採購金額(萬元)',data:capTop6.map(d=>+(d.amount/10000).toFixed(1)),backgroundColor:'#534AB766',borderRadius:3,yAxisID:'y'},{type:'line',label:'每生平均(千元)',data:capTop6.map(d=>+(d.perStudent/1000).toFixed(2)),borderColor:'#D85A30',pointBackgroundColor:'#D85A30',tension:0.3,borderWidth:2,pointRadius:4,yAxisID:'y2'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{font:f,color:'#888780'}},y:{ticks:{font:f,color:'#534AB7',callback:v=>v+'萬'},grid:{color:'rgba(0,0,0,0.06)'},position:'left'},y2:{ticks:{font:f,color:'#D85A30',callback:v=>v+'千'},position:'right',grid:{drawOnChartArea:false}}}}});
+
+// 3a. Branch grouped bar
+new Chart(document.getElementById('c6'),{type:'bar',data:{labels:['餐旅學院','廚藝學院','通識中心','觀光學院','國際學院'],datasets:[{label:'教師人次',data:[14,18,9,9,5],backgroundColor:'#185FA5',borderRadius:3},{label:'學生人次',data:[295,360,219,145,83],backgroundColor:'#1D9E7599',borderRadius:3}]},options:{...baseOpts,scales:{x:{ticks:{font:f,color:'#888780'}},y:{ticks:{font:f,color:'#888780'},grid:{color:'rgba(0,0,0,0.06)'}}},plugins:{legend:{display:false},tooltip:{mode:'index'}}}});
+
+// 3b. Student pie
+new Chart(document.getElementById('c7'),{type:'doughnut',data:{labels:['廚藝學院 32.7%','餐旅學院 26.8%','通識中心 19.9%','觀光學院 13.2%','國際學院 7.5%'],datasets:[{data:[360,295,219,145,83],backgroundColor:['#185FA5','#1D9E75','#BA7517','#D85A30','#534AB7'],borderWidth:2,borderColor:'#fff'}]},options:{...baseOpts,cutout:'55%'}});
+
+// 4a. Identity pie
+new Chart(document.getElementById('c8'),{type:'doughnut',data:{labels:['學生 63.0%','校外人士 22.2%','教師 12.3%','職員 2.5%'],datasets:[{data:[21890,7710,4279,886],backgroundColor:['#185FA5','#1D9E75','#BA7517','#888780'],borderWidth:2,borderColor:'#fff'}]},options:{...baseOpts,cutout:'55%'}});
+
+// 4b. Stacked bar
+new Chart(document.getElementById('c9'),{type:'bar',data:{labels:['A 教學創新精進','B 善盡社會責任','C 產學連結','D 提升高教公共性'],datasets:[{label:'學生',data:[7724,4612,6011,3543],backgroundColor:'#185FA5',borderRadius:2},{label:'教師',data:[994,419,302,2564],backgroundColor:'#1D9E75',borderRadius:2},{label:'校外人士',data:[1023,1052,4297,1338],backgroundColor:'#D85A30',borderRadius:2}]},options:{...baseOpts,scales:{x:{stacked:true,ticks:{font:f,color:'#888780'}},y:{stacked:true,ticks:{font:f,color:'#888780'},grid:{color:'rgba(0,0,0,0.06)'}}},plugins:{legend:{display:false},tooltip:{mode:'index'}}}});
+
+// 5. Industry expert bar
+new Chart(document.getElementById('c10'),{type:'bar',data:{labels:['廚藝學院','觀光學院','餐旅學院','國際學院','教學中心'],datasets:[{data:[13.47,12.32,11.92,7.82,6.61],backgroundColor:['#185FA5','#1D9E75','#BA7517','#D85A30','#888780'],borderRadius:4}]},options:{...baseOpts,scales:{x:{ticks:{font:f,color:'#888780'}},y:{min:0,max:18,ticks:{font:f,color:'#888780',callback:v=>v+'%'},grid:{color:'rgba(0,0,0,0.06)'}}},plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+c.raw+'%'}}}}});
+
+// 6a. TA stipend pie
+new Chart(document.getElementById('c11'),{type:'doughnut',data:{labels:['餐旅學院 29.4%','廚藝學院 25.4%','國際學院 18.3%','觀光學院 13.8%','共教委員會 13.1%'],datasets:[{data:[29.42,25.43,18.26,13.83,13.07],backgroundColor:['#185FA5','#1D9E75','#BA7517','#D85A30','#888780'],borderWidth:2,borderColor:'#fff'}]},options:{...baseOpts,cutout:'55%'}});
+
+// 6b. Radar
+new Chart(document.getElementById('c12'),{type:'radar',data:{labels:['餐旅學院','觀光學院','廚藝學院','國際學院','共教委員會'],datasets:[{label:'TA課程覆蓋率',data:[19.38,14.02,26.23,33.09,20.96],borderColor:'#185FA5',backgroundColor:'#185FA522',pointBackgroundColor:'#185FA5',borderWidth:2},{label:'修課人次覆蓋率',data:[23.33,12.69,26.51,31.48,19.07],borderColor:'#D85A30',backgroundColor:'#D85A3022',pointBackgroundColor:'#D85A30',borderWidth:2,borderDash:[4,3]}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{r:{ticks:{font:{size:10},color:'#888780',callback:v=>v+'%'},pointLabels:{font:{size:11},color:'#5f5e5a'},grid:{color:'rgba(0,0,0,0.1)'},angleLines:{color:'rgba(0,0,0,0.1)'}}}}});
+
+// 6c. TA grouped bar
+new Chart(document.getElementById('c13'),{type:'bar',data:{labels:['餐旅學院','觀光學院','廚藝學院','國際學院','共教委員會'],datasets:[{label:'113-2學期',data:[22.66,12.75,28.87,28.94,18.73],backgroundColor:'#185FA5',borderRadius:3},{label:'114-1學期',data:[23.97,12.63,24.32,33.64,19.40],backgroundColor:'#1D9E75',borderRadius:3}]},options:{...baseOpts,scales:{x:{ticks:{font:f,color:'#888780'}},y:{min:0,ticks:{font:f,color:'#888780',callback:v=>v+'%'},grid:{color:'rgba(0,0,0,0.06)'}}},plugins:{legend:{display:false},tooltip:{mode:'index',callbacks:{label:c=>` ${c.dataset.label}: ${c.raw}%`}}}}});
+</script>
+</body>
+</html>
